@@ -1,0 +1,19 @@
+{
+  "targets": {
+    "release": {
+      "outFile": "build/wams-math-base.wasm",
+      "optimize": "speed",
+      "runtime": "stub",
+      "noExportMemory": false,
+      "exportRuntime": false
+    },
+    "simd": {
+      "outFile": "build/wams-math-simd.wasm",
+      "optimize": "speed",
+      "runtime": "stub",
+      "enable": ["simd"],
+      "noExportMemory": false,
+      "exportRuntime": false
+    }
+  }
+}

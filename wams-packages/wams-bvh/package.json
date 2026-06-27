@@ -1,0 +1,10 @@
+{
+  "name": "@uploop/wams-bvh",
+  "version": "0.3.3",
+  "type": "module",
+  "main": "src/index.js",
+  "description": "WASM-accelerated BVH builder and ray traverser (AssemblyScript)",
+  "scripts": {
+    "build": "asc assembly/index.ts --outFile build/wams-bvh-base.wasm --optimize speed --runtime stub"
+  }
+}

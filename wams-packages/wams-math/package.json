@@ -1,0 +1,15 @@
+{
+  "name": "@uploop/wams-math",
+  "version": "0.3.1",
+  "type": "module",
+  "main": "src/index.js",
+  "description": "WASM-accelerated math — vec3/mat4/quat/aabb bulk operations (AssemblyScript)",
+  "scripts": {
+    "build": "asc assembly/index.ts --outFile build/wams-math-base.wasm --optimize speed --runtime stub",
+    "build:simd": "asc assembly/index.ts --outFile build/wams-math-simd.wasm --optimize speed --runtime stub --enable simd",
+    "build:all": "npm run build && npm run build:simd"
+  },
+  "devDependencies": {
+    "assemblyscript": "^0.27.0"
+  }
+}

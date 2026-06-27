@@ -21,6 +21,7 @@ const uploopPackages = [
   "director",
   "custom-pipeline",
   "ray-tracing",
+  "engine",
 ];
 
 const alias = {};

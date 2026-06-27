@@ -1,0 +1,11 @@
+{
+  "name": "@uploop/engine",
+  "version": "0.2.5",
+  "type": "module",
+  "main": "src/index.js",
+  "description": "Uploop engine init config — auto-detect WebGL/WebGPU/WASM, one-line setup",
+  "dependencies": {
+    "@uploop/renderer": "workspace:*",
+    "@uploop/scene": "workspace:*"
+  }
+}

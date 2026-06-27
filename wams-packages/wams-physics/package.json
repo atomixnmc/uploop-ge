@@ -1,0 +1,10 @@
+{
+  "name": "@uploop/wams-physics",
+  "version": "0.3.2",
+  "type": "module",
+  "main": "src/index.js",
+  "description": "WASM-accelerated physics — broadphase, narrowphase, constraint solver (AssemblyScript)",
+  "scripts": {
+    "build": "asc assembly/index.ts --outFile build/wams-physics-base.wasm --optimize speed --runtime stub"
+  }
+}
