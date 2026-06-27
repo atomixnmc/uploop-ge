@@ -30,15 +30,20 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm test run
 
-      - name: Set version from tag
+      - name: Extract version
+        id: version
         run: |
-          TAG=${GITHUB_REF#refs/tags/v}
-          echo "VERSION=$TAG" >> $GITHUB_ENV
-          # Update root and all workspace package.json versions
+          V="${{ github.ref_name }}"
+          echo "version=${V#v}" >> $GITHUB_OUTPUT
+
+      - name: Update package versions
+        run: |
           node -e "
             const fs = require('fs');
-            const v = '${{ env.VERSION }}';
-            ['package.json', ...require('./package.json').workspaces.map(w => w + '/package.json')].forEach(f => {
+            const v = '${{ steps.version.outputs.version }}';
+            const ws = require('./package.json').workspaces;
+            ['.', ...ws].forEach(dir => {
+              const f = dir + '/package.json';
               try {
                 const p = JSON.parse(fs.readFileSync(f, 'utf8'));
                 p.version = v;
@@ -50,7 +55,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: v${{ env.VERSION }}
+          name: v${{ steps.version.outputs.version }}
           generate_release_notes: true
           draft: false
-          prerelease: ${{ contains(env.VERSION, '-') }}
+          prerelease: ${{ contains(steps.version.outputs.version, '-') }}
