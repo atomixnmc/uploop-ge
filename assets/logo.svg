@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 160" width="600" height="160">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4fc3f7"/>
+      <stop offset="100%" style="stop-color:#1565c0"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#81d4fa"/>
+      <stop offset="100%" style="stop-color:#29b6f6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Cube icon -->
+  <g transform="translate(60,40)">
+    <polygon points="30,0 60,18 60,58 30,40" fill="#0d47a1" opacity="0.6"/>
+    <polygon points="0,18 30,0 30,40 0,58" fill="#1565c0" opacity="0.8"/>
+    <polygon points="0,18 30,0 60,18 30,36" fill="url(#g2)"/>
+    <circle cx="30" cy="18" r="3" fill="#e3f2fd"/>
+    <circle cx="0" cy="18" r="2" fill="#90caf9"/>
+    <circle cx="60" cy="18" r="2" fill="#90caf9"/>
+  </g>
+
+  <text x="130" y="85" font-family="system-ui,-apple-system,sans-serif" font-weight="800" font-size="52" fill="url(#g)">uploop</text>
+  <text x="345" y="85" font-family="system-ui,-apple-system,sans-serif" font-weight="300" font-size="52" fill="#e0e0e0">-ge</text>
+
+  <text x="130" y="115" font-family="monospace" font-size="13" fill="#78909c">WebGL / WebGPU Graphics Engine</text>
+
+  <line x1="130" y1="125" x2="560" y2="125" stroke="#1565c0" stroke-width="1.5" opacity="0.4"/>
+</svg>
