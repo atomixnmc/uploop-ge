@@ -1,0 +1,10 @@
+{
+  "name": "@uploop/director",
+  "version": "0.2.2",
+  "type": "module",
+  "main": "src/index.js",
+  "description": "Cinematic camera flows, movement constraints, timeline sequencing — Uploop HyperGraph style",
+  "dependencies": {
+    "@uploop/math": "workspace:*"
+  }
+}

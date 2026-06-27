@@ -1,0 +1,11 @@
+{
+  "name": "@uploop/ray-tracing",
+  "version": "0.2.4",
+  "type": "module",
+  "main": "src/index.js",
+  "description": "Software ray tracing with BVH acceleration, path tracing — Uploop HyperGraph style",
+  "dependencies": {
+    "@uploop/math": "workspace:*",
+    "@uploop/geometry": "workspace:*"
+  }
+}

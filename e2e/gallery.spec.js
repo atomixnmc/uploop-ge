@@ -3,12 +3,12 @@ import { test, expect } from "@playwright/test";
 const BASE = "http://localhost:3001";
 
 test.describe("uploop-ge gallery", () => {
-  test("gallery loads 27 example cards", async ({ page }) => {
+  test("gallery loads 31 example cards", async ({ page }) => {
     await page.goto(BASE);
     await page.waitForSelector(".gallery");
     const cards = page.locator(".card");
     await expect(cards.first()).toBeVisible({ timeout: 5000 });
-    expect(await cards.count()).toBe(27);
+    expect(await cards.count()).toBe(31);
   });
 
   test("filter buttons filter correctly", async ({ page }) => {
@@ -17,15 +17,15 @@ test.describe("uploop-ge gallery", () => {
 
     await page.click('button[data-filter="core"]');
     await page.waitForTimeout(300);
-    expect(await page.locator(".card").count()).toBe(4);
+    expect(await page.locator(".card").count()).toBe(8);
 
     await page.click('button[data-filter="3d"]');
     await page.waitForTimeout(300);
-    expect(await page.locator(".card").count()).toBeGreaterThan(10);
+    expect(await page.locator(".card").count()).toBeGreaterThan(15);
 
     await page.click('button[data-filter="all"]');
     await page.waitForTimeout(300);
-    expect(await page.locator(".card").count()).toBe(27);
+    expect(await page.locator(".card").count()).toBe(31);
   });
 
   test("core example opens via hash route", async ({ page }) => {

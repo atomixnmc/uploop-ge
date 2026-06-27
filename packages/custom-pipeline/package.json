@@ -1,0 +1,11 @@
+{
+  "name": "@uploop/custom-pipeline",
+  "version": "0.2.3",
+  "type": "module",
+  "main": "src/index.js",
+  "description": "Pluggable render pipeline with injectable stages, multi-pass, deferred, shadows",
+  "dependencies": {
+    "@uploop/renderer": "workspace:*",
+    "@uploop/shader": "workspace:*"
+  }
+}

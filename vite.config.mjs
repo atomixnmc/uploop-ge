@@ -17,6 +17,10 @@ const uploopPackages = [
   "physics",
   "game-ui",
   "loaders",
+  "parallel",
+  "director",
+  "custom-pipeline",
+  "ray-tracing",
 ];
 
 const alias = {};

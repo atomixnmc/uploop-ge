@@ -1,0 +1,7 @@
+{
+  "name": "@uploop/parallel",
+  "version": "0.2.1",
+  "type": "module",
+  "main": "src/index.js",
+  "description": "Parallel execution, task scheduler & Web Worker pool — Uploop HyperGraph style"
+}

@@ -45,6 +45,10 @@ console and run `__gallery.describe()` to see the typed graph.
 | `@uploop/physics` | Rigid bodies, colliders, SAT, world stepping | — |
 | `@uploop/game-ui` | WebGL UI components — Button, Slider, Toggle, Panel, layout | 25 |
 | `@uploop/loaders` | OBJ, GLTF 2.0, texture, cubemap loading | — |
+| `@uploop/parallel` | Web Worker pool, task scheduler, SharedArrayBuffer | — |
+| `@uploop/director` | Cinematic camera flows, constraints, timeline sequencing | — |
+| `@uploop/custom-pipeline` | Pluggable multi-pass render pipeline, deferred, post-FX presets | — |
+| `@uploop/ray-tracing` | Software ray tracing, BVH acceleration, path tracing | — |
 
 **97 unit + 10 e2e tests** — [CI runs on every push](https://github.com/atomixnmc/uploop-ge/actions).
 
@@ -71,6 +75,7 @@ pnpm test:e2e     # playwright (e2e)
 | 05–18 | Materials, Camera, Physics, Instancing, Triangle→PostFX, Skybox, Animation | **3D pipeline** |
 | 19–25 | Sprites, Tilemap, Breakout, Platformer, Snake, Pong, Asteroids | **2D / Games** |
 | 26–27 | Static Model Viewer, Animated Model | **Model loaders** |
+| 28–31 | Parallel Particles, Cinematic Camera, Custom Pipeline, Ray Tracer | **v0.2.x advanced** |
 
 Open `http://localhost:3001` for the gallery. Hash-route directly:
 `/#01-game-loop`, `/#19-sprites`, etc.
