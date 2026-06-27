@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>uploop-ge — Graphics Engine Examples</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body {
+                font-family: system-ui, sans-serif;
+                background: #0a0a0f;
+                color: #e0e0e0;
+            }
+            header {
+                padding: 20px;
+                background: #111118;
+                border-bottom: 1px solid #222;
+            }
+            h1 {
+                font-size: 1.5em;
+                color: #6cf;
+            }
+            .subtitle {
+                color: #888;
+                margin-top: 4px;
+                font-size: 0.85em;
+            }
+            .subtitle em {
+                color: #a6f;
+                font-style: normal;
+            }
+            nav {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding: 12px 20px;
+                background: #0d0d14;
+                border-bottom: 1px solid #1a1a24;
+            }
+            nav button {
+                padding: 6px 14px;
+                border: 1px solid #333;
+                border-radius: 4px;
+                background: #161622;
+                color: #ccc;
+                cursor: pointer;
+                font-size: 0.8em;
+                transition:
+                    background 0.15s,
+                    border-color 0.15s;
+            }
+            nav button:hover {
+                background: #222;
+                border-color: #555;
+            }
+            nav button.active {
+                background: #1a3a5c;
+                border-color: #48a;
+                color: #fff;
+            }
+            .gallery {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                gap: 12px;
+                padding: 20px;
+            }
+            .card {
+                background: #111118;
+                border: 1px solid #1a1a24;
+                border-radius: 8px;
+                overflow: hidden;
+                cursor: pointer;
+                transition: border-color 0.2s;
+            }
+            .card:hover {
+                border-color: #48a;
+            }
+            .card .thumb {
+                width: 100%;
+                height: 140px;
+                display: block;
+                background: #0a0a14;
+            }
+            .card .thumb canvas {
+                width: 100%;
+                height: 100%;
+                display: block;
+            }
+            .card-info {
+                padding: 10px;
+            }
+            .card-info h3 {
+                font-size: 0.9em;
+                margin: 0;
+            }
+            .card-info p {
+                font-size: 0.7em;
+                color: #888;
+                margin: 4px 0 0;
+            }
+            .card-info .tags {
+                margin-top: 6px;
+                display: flex;
+                gap: 4px;
+                flex-wrap: wrap;
+            }
+            .tag {
+                display: inline-block;
+                padding: 1px 6px;
+                border-radius: 3px;
+                font-size: 0.65em;
+            }
+            .tag-3d {
+                background: #1a2a3a;
+                color: #48a;
+            }
+            .tag-2d {
+                background: #1a3a2a;
+                color: #4a8;
+            }
+            .tag-game {
+                background: #3a2a1a;
+                color: #ca4;
+            }
+            .tag-core {
+                background: #2a1a3a;
+                color: #a6f;
+            }
+            .hidden {
+                display: none;
+            }
+            .frame {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                display: flex;
+                flex-direction: column;
+                border: none;
+                margin: 0;
+                border-radius: 0;
+                background: #000;
+                z-index: 100;
+            }
+            .frame .canvas-wrap {
+                flex: 1;
+                position: relative;
+                overflow: hidden;
+            }
+            .frame canvas {
+                display: block;
+            }
+            .frame-header {
+                flex-shrink: 0;
+                padding: 10px 16px;
+                background: #161622;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .frame-header h2 {
+                font-size: 1em;
+                order: 1;
+            }
+            .frame-controls {
+                display: flex;
+                gap: 4px;
+                order: 0;
+            }
+            .frame-controls button {
+                padding: 3px 8px;
+                font-size: 0.7em;
+                border: 1px solid #444;
+                border-radius: 3px;
+                background: #222;
+                color: #ccc;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>uploop-ge</h1>
+            <p class="subtitle">
+                WebGL/WebGPU Graphics Engine &mdash; <em>22 Examples</em> built
+                on the uploop architecture
+            </p>
+        </header>
+
+        <nav id="filters">
+            <button data-filter="all">All</button>
+            <button data-filter="core">Core</button>
+            <button data-filter="3d">3D</button>
+            <button data-filter="2d">2D</button>
+            <button data-filter="game">Game</button>
+        </nav>
+
+        <div id="gallery" class="gallery"></div>
+
+        <div id="viewer" class="hidden">
+            <div class="frame">
+                <div class="frame-header">
+                    <div class="frame-controls">
+                        <button id="btn-back">&larr; Back</button>
+                    </div>
+                    <h2 id="viewer-title"></h2>
+                </div>
+                <div class="canvas-wrap">
+                    <canvas id="viewer-canvas"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <script type="module">
+            // ═══════════════════════════════════════════════════════════════════
+            //  createGameLoop — the uploop core primitive
+            //  In production: import { createGameLoop } from '@uploop/scene'
+            //  Implemented inline so the gallery *is* its own architecture demo.
+            // ═══════════════════════════════════════════════════════════════════
+            function createGameLoop({ name, state: init, update }) {
+                let s = { ...init };
+                const subs = new Set();
+                let pending = null,
+                    queued = false;
+
+                function flush() {
+                    if (!pending) return;
+                    const p = pending;
+                    pending = null;
+                    queued = false;
+                    for (const o of p) Object.assign(s, o);
+                    for (const fn of subs) fn(s);
+                }
+
+                function send(ev, ...args) {
+                    if (!update[ev]) {
+                        console.warn(`[${name}] unknown event: "${ev}"`);
+                        return;
+                    }
+                    const patch = update[ev](s, ...args);
+                    if (patch) {
+                        if (!pending) pending = [];
+                        pending.push(patch);
+                        if (!queued) {
+                            queued = true;
+                            queueMicrotask(flush);
+                        }
+                    }
+                }
+
+                return {
+                    send,
+                    subscribe(fn) {
+                        subs.add(fn);
+                        fn(s);
+                        return () => subs.delete(fn);
+                    },
+                    describe() {
+                        const n = (id, kind) => ({ id: `${name}.${id}`, kind });
+                        return {
+                            name,
+                            kind: "HyperGraph",
+                            nodes: [
+                                n("loop", "component"),
+                                n("state", "state"),
+                                ...Object.keys(update).map((k) =>
+                                    n(`update.${k}`, "handler"),
+                                ),
+                                n("view", "subscription"),
+                            ],
+                            edges: [
+                                {
+                                    from: `${name}.state`,
+                                    to: `${name}.view`,
+                                    kind: "drives",
+                                },
+                                ...Object.keys(update).map((k) => ({
+                                    from: `${name}.update.${k}`,
+                                    to: `${name}.state`,
+                                    kind: "mutates",
+                                })),
+                            ],
+                        };
+                    },
+                };
+            }
+
+            // ═══════════════════════════════════════════════════════════════════
+            //  Examples — 22 demos covering core architecture, 3D, 2D, & games
+            // ═══════════════════════════════════════════════════════════════════
+            const examples = [
+                {
+                    id: "01-game-loop",
+                    title: "Game Loop",
+                    desc: "State \u2192 Update \u2192 Render \u2014 the uploop way",
+                    tags: ["core"],
+                },
+                {
+                    id: "02-entities",
+                    title: "Entity Spawner",
+                    desc: "Creating/destroying entities through the loop",
+                    tags: ["core"],
+                },
+                {
+                    id: "03-ecs",
+                    title: "ECS System",
+                    desc: "Entity Component System \u2014 Transform, Render, Physics",
+                    tags: ["core"],
+                },
+                {
+                    id: "04-scenegraph",
+                    title: "SceneGraph Component",
+                    desc: "Hierarchical transforms with parent-child ECS",
+                    tags: ["core"],
+                },
+                {
+                    id: "05-materials",
+                    title: "Declarative Materials",
+                    desc: "Material switching via state updates",
+                    tags: ["3d"],
+                },
+                {
+                    id: "06-camera",
+                    title: "Camera System",
+                    desc: "Camera management through the loop",
+                    tags: ["3d"],
+                },
+                {
+                    id: "07-physics",
+                    title: "Physics Loop",
+                    desc: "Physics integration with fixed timestep",
+                    tags: ["3d"],
+                },
+                {
+                    id: "08-instancing",
+                    title: "Instanced Rendering",
+                    desc: "10,000 cubes via instanced draw",
+                    tags: ["3d"],
+                },
+                {
+                    id: "09-triangle",
+                    title: "Triangle",
+                    desc: "WebGL hello world \u2014 raw shader pipeline",
+                    tags: ["3d"],
+                },
+                {
+                    id: "10-cube",
+                    title: "Rotating Cube",
+                    desc: "3D cube with Phong shading",
+                    tags: ["3d"],
+                },
+                {
+                    id: "11-sphere",
+                    title: "Lit Sphere",
+                    desc: "Blinn-Phong lit sphere",
+                    tags: ["3d"],
+                },
+                {
+                    id: "12-textured",
+                    title: "Textured Cube",
+                    desc: "UV-mapped checkerboard texture",
+                    tags: ["3d"],
+                },
+                {
+                    id: "13-lighting",
+                    title: "Lighting Demo",
+                    desc: "Multi-light scene comparison",
+                    tags: ["3d"],
+                },
+                {
+                    id: "14-pbr",
+                    title: "PBR Materials",
+                    desc: "Metallic-roughness grid",
+                    tags: ["3d"],
+                },
+                {
+                    id: "15-particles",
+                    title: "Particle System",
+                    desc: "500 GPU particles",
+                    tags: ["3d"],
+                },
+                {
+                    id: "16-postfx",
+                    title: "Post-Processing",
+                    desc: "Framebuffer + tonemap pipeline",
+                    tags: ["3d"],
+                },
+                {
+                    id: "17-skybox",
+                    title: "Skybox",
+                    desc: "Procedural cubemap + reflections",
+                    tags: ["3d"],
+                },
+                {
+                    id: "18-animation",
+                    title: "Animation",
+                    desc: "Procedural character animation",
+                    tags: ["3d"],
+                },
+                {
+                    id: "19-sprites",
+                    title: "Sprite Renderer",
+                    desc: "100 2D sprites with velocity",
+                    tags: ["2d"],
+                },
+                {
+                    id: "20-tilemap",
+                    title: "Tilemap",
+                    desc: "20\u00d715 grid with camera scroll",
+                    tags: ["2d"],
+                },
+                {
+                    id: "21-breakout",
+                    title: "Breakout",
+                    desc: "Paddle, bricks, lives \u2014 game loop style",
+                    tags: ["2d", "game"],
+                },
+                {
+                    id: "22-platformer",
+                    title: "Platformer",
+                    desc: "Platformer with coins + gravity",
+                    tags: ["2d", "game"],
+                },
+                {
+                    id: "23-snake",
+                    title: "Snake",
+                    desc: "Classic snake — eat, grow, survive",
+                    tags: ["2d", "game"],
+                },
+                {
+                    id: "24-pong",
+                    title: "Pong",
+                    desc: "Retro Pong — W/S + AI opponent",
+                    tags: ["2d", "game"],
+                },
+                {
+                    id: "25-asteroids",
+                    title: "Asteroids",
+                    desc: "Thrust, shoot, survive the asteroid field",
+                    tags: ["2d", "game"],
+                },
+                {
+                    id: "26-model-static",
+                    title: "Model Viewer",
+                    desc: "Load and display GLTF models from the web",
+                    tags: ["3d"],
+                },
+                {
+                    id: "27-model-animated",
+                    title: "Animated Model",
+                    desc: "GLTF skeletal animation playback",
+                    tags: ["3d"],
+                },
+            ];
+
+            // ═══════════════════════════════════════════════════════════════════
+            //  Gallery loop — the gallery *is* a HyperGraph component
+            // ═══════════════════════════════════════════════════════════════════
+            const gallery = createGameLoop({
+                name: "uploop-ge-gallery",
+                state: {
+                    examples,
+                    filter: "all",
+                    selectedId: null,
+                    loading: false,
+                    error: null,
+                },
+                update: {
+                    filter(_s, tag) {
+                        return { filter: tag };
+                    },
+                    select(_s, id) {
+                        if (location.hash !== "#" + id) {
+                            _ignoreHash = true;
+                            location.hash = "#" + id;
+                            setTimeout(() => {
+                                _ignoreHash = false;
+                            }, 0);
+                        }
+                        return { selectedId: id, loading: true, error: null };
+                    },
+                    loaded(_s) {
+                        return { loading: false };
+                    },
+                    back(_s) {
+                        if (location.hash) {
+                            _ignoreHash = true;
+                            history.replaceState(null, "", location.pathname);
+                            setTimeout(() => {
+                                _ignoreHash = false;
+                            }, 0);
+                        }
+                        return {
+                            selectedId: null,
+                            loading: false,
+                            error: null,
+                        };
+                    },
+                    error(_s, msg) {
+                        return { error: msg, loading: false };
+                    },
+                },
+            });
+
+            // DOM refs
+            const $g = document.getElementById("gallery");
+            const $v = document.getElementById("viewer");
+            const $n = document.getElementById("filters");
+            const $t = document.getElementById("viewer-title");
+            let $cv = document.getElementById("viewer-canvas");
+            let _cleanup = null;
+
+            // ── Subscribe: state drives rendering ────────────────────────────
+            gallery.subscribe((st) => {
+                if (st.selectedId) showViewer(st);
+                else showGallery(st);
+            });
+
+            // ── Gallery grid ─────────────────────────────────────────────────
+            function showGallery(st) {
+                $g.classList.remove("hidden");
+                $n.classList.remove("hidden");
+                $v.classList.add("hidden");
+                if (_cleanup) {
+                    _cleanup();
+                    _cleanup = null;
+                }
+
+                const list =
+                    st.filter === "all"
+                        ? st.examples
+                        : st.examples.filter((e) => e.tags.includes(st.filter));
+
+                for (const btn of $n.querySelectorAll("button"))
+                    btn.classList.toggle(
+                        "active",
+                        btn.dataset.filter === st.filter,
+                    );
+
+                $g.innerHTML = "";
+                for (const ex of list) {
+                    const hue = (parseInt(ex.id) * 22) % 360;
+                    const card = document.createElement("div");
+                    card.className = "card";
+                    card.dataset.id = ex.id;
+                    card.innerHTML = `<div class="thumb" style="background:linear-gradient(135deg,hsl(${hue},30%,10%),hsl(${hue + 40},20%,6%))">
+                        <canvas width="320" height="180" aria-hidden="true"></canvas>
+                    </div>
+                    <div class="card-info">
+                        <h3>${ex.id.replace(/^\d+-/, "").replace(/-/g, " ")} \u2014 ${ex.title}</h3>
+                        <p>${ex.desc}</p>
+                        <div class="tags">${ex.tags.map((t) => `<span class="tag tag-${t}">${t}</span>`).join("")}</div>
+                    </div>`;
+                    $g.appendChild(card);
+
+                    requestAnimationFrame(() => {
+                        const c = card.querySelector("canvas");
+                        if (!c) return;
+                        const ctx = c.getContext("2d");
+                        ctx.fillStyle = "#0a0a14";
+                        ctx.fillRect(0, 0, 320, 180);
+                        ctx.fillStyle = "#e0e0e0";
+                        ctx.font = "12px system-ui";
+                        ctx.textAlign = "center";
+                        ctx.fillText(ex.title, 160, 85);
+                        ctx.fillStyle = "#6cf";
+                        ctx.font = "10px monospace";
+                        ctx.fillText("uploop-ge", 160, 105);
+                    });
+                }
+            }
+
+            // ── Viewer ───────────────────────────────────────────────────────
+            function showViewer(st) {
+                $g.classList.add("hidden");
+                $n.classList.add("hidden");
+                $v.classList.remove("hidden");
+
+                const ex = st.examples.find((e) => e.id === st.selectedId);
+                if (!ex) return;
+                $t.textContent = `${ex.title} \u2014 ${ex.desc}`;
+
+                if (st.loading) loadExample(st.selectedId);
+            }
+
+            async function loadExample(id) {
+                // Clean up previous example
+                if (_cleanup) {
+                    _cleanup();
+                    _cleanup = null;
+                }
+
+                // Fresh canvas: a WebGL context cannot become 2D (and vice versa)
+                // Strip inline styles so the new example controls its own size
+                const fresh = document.createElement("canvas");
+                fresh.id = "viewer-canvas";
+                $cv.parentElement.replaceChild(fresh, $cv);
+                $cv = fresh;
+
+                // Set default size immediately (example may override via resize)
+                const dpr = window.devicePixelRatio || 1;
+                const cw = Math.max(1280, window.innerWidth * 0.9);
+                const ch = Math.max(720, window.innerHeight * 0.85);
+                $cv.width = Math.floor(cw * dpr);
+                $cv.height = Math.floor(ch * dpr);
+                $cv.style.width = cw + "px";
+                $cv.style.height = ch + "px";
+
+                // Example context: communicate back to the gallery loop
+                const ctx = {
+                    send(ev, ...args) {
+                        gallery.send(ev, ...args);
+                    },
+                    getState() {
+                        return { ...gallery._state };
+                    },
+                };
+
+                try {
+                    const mod = await import(`./${id}/main.js`);
+                    const init = mod.init || mod.default;
+                    if (typeof init === "function") {
+                        const c = init($cv, ctx);
+                        if (typeof c === "function") _cleanup = c;
+                    }
+                    gallery.send("loaded");
+                } catch (e) {
+                    console.error(`Failed to load "${id}":`, e);
+                    const c2 = $cv.getContext("2d");
+                    if (c2) {
+                        c2.fillStyle = "#000";
+                        c2.fillRect(0, 0, $cv.width, $cv.height);
+                        c2.fillStyle = "#f44";
+                        c2.font = "12px monospace";
+                        c2.textAlign = "center";
+                        c2.fillText(
+                            `Error: ${e.message}`,
+                            $cv.width / 2,
+                            $cv.height / 2 + 10,
+                        );
+                    }
+                    gallery.send("error", e.message);
+                }
+            }
+
+            // ── CSP-safe event binding (zero inline handlers) ────────────────
+            for (const btn of $n.querySelectorAll("button"))
+                btn.addEventListener("click", () =>
+                    gallery.send("filter", btn.dataset.filter),
+                );
+
+            $g.addEventListener("click", (e) => {
+                const card = e.target.closest(".card");
+                if (card) gallery.send("select", card.dataset.id);
+            });
+
+            document
+                .getElementById("btn-back")
+                .addEventListener("click", () => gallery.send("back"));
+
+            let _ignoreHash = false;
+
+            // Hash-based routing: /#01-game-loop loads example directly
+            function hashToId() {
+                const h = location.hash.slice(1);
+                return examples.some((e) => e.id === h) ? h : null;
+            }
+            window.addEventListener("hashchange", () => {
+                if (_ignoreHash) return;
+                const id = hashToId();
+                if (id) gallery.send("select", id);
+                else gallery.send("back");
+            });
+            const initHash = hashToId();
+            if (initHash) gallery.send("select", initHash);
+
+            // Expose for devtools
+            gallery.subscribe((s) => {
+                gallery._state = s;
+            });
+            window.__gallery = gallery;
+            console.log("[uploop-ge]", gallery.describe());
+        </script>
+    </body>
+</html>

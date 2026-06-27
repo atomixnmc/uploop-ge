@@ -1,0 +1,21 @@
+{
+  "name": "@uploop/geometry",
+  "version": "0.1.0",
+  "description": "Uploop mesh geometry — vertex formats, primitives, BVH",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": {
+      "import": "./src/index.js"
+    }
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@uploop/math": "workspace:*"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@uploop/tween",
+  "version": "0.1.0",
+  "description": "Uploop tween system — property animation with easing, yoyo, repeat",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": {
+      "import": "./src/index.js"
+    }
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@uploop/math": "workspace:*"
+  }
+}

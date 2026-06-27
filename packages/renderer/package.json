@@ -1,0 +1,24 @@
+{
+  "name": "@uploop/renderer",
+  "version": "0.1.0",
+  "description": "Uploop renderer — WebGL 2.0 + WebGPU backend, pipeline, framebuffer, draw",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": {
+      "import": "./src/index.js"
+    }
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@uploop/math": "workspace:*",
+    "@uploop/shader": "workspace:*",
+    "@uploop/resources": "workspace:*",
+    "@uploop/geometry": "workspace:*"
+  }
+}
