@@ -6,6 +6,7 @@
   <a href="https://github.com/atomixnmc/uploop-ge/actions/workflows/ci.yml"><img src="https://github.com/atomixnmc/uploop-ge/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/atomixnmc/uploop-ge/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
   <a href="https://github.com/atomixnmc/uploop-ge"><img src="https://img.shields.io/github/v/tag/atomixnmc/uploop-ge?label=version" alt="Version"></a>
+  <a href="https://atomixnmc.github.io/uploop-ge"><img src="https://img.shields.io/badge/demo-live-4fc3f7.svg" alt="Demo"></a>
   <a href="https://github.com/atomixnmc/uploopjs"><img src="https://img.shields.io/badge/uploopjs-core-6cf.svg" alt="uploopjs"></a>
 </p>
 
@@ -57,6 +58,8 @@ pnpm dev          # → http://localhost:3001 — 27 interactive examples
 pnpm test         # vitest (unit)
 pnpm test:e2e     # playwright (e2e)
 ```
+
+**Live demo**: [atomixnmc.github.io/uploop-ge](https://atomixnmc.github.io/uploop-ge)
 
 ## Examples
 
