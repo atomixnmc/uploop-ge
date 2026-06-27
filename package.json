@@ -9,7 +9,8 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "pnpm run build -ws --if-present",
+    "build": "pnpm run build -ws --if-present && vite build",
+    "build:pages": "pnpm run build -ws --if-present && cross-env VITE_BASE=/uploop-ge/ vite build",
     "preview": "vite preview",
     "test": "vitest",
     "test:e2e": "playwright test"

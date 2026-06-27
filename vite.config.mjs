@@ -27,8 +27,9 @@ for (const pkg of uploopPackages) {
   );
 }
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   root: "examples",
+  base: process.env.VITE_BASE || "/",
   server: {
     port: 3001,
     open: true,
@@ -40,5 +41,6 @@ export default defineConfig({
   build: {
     outDir: "../dist",
     emptyOutDir: true,
+    target: "es2020",
   },
-});
+}));
