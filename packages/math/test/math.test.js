@@ -133,6 +133,14 @@ describe('quat', () => {
     // Should be halfway
     expect(quat.length(out)).toBeCloseTo(1)
   })
+  it('set', () => {
+    const q = quat.create()
+    quat.set(q, 0.1, 0.2, 0.3, 0.4)
+    expect(q[0]).toBeCloseTo(0.1, 5)
+    expect(q[1]).toBeCloseTo(0.2, 5)
+    expect(q[2]).toBeCloseTo(0.3, 5)
+    expect(q[3]).toBeCloseTo(0.4, 5)
+  })
 })
 
 describe('color', () => {

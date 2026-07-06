@@ -23,10 +23,17 @@ export function init(canvas) {
   // ── Loading overlay ────────────────────────────────────────────
   const loadingDiv = document.createElement("div");
   Object.assign(loadingDiv.style, {
-    position: "absolute", inset: "0",
-    display: "flex", alignItems: "center", justifyContent: "center",
-    fontFamily: "monospace", fontSize: "18px", color: "#aaa",
-    background: "#0a0a14", zIndex: "20", userSelect: "none",
+    position: "absolute",
+    inset: "0",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontFamily: "monospace",
+    fontSize: "18px",
+    color: "#aaa",
+    background: "#0a0a14",
+    zIndex: "20",
+    userSelect: "none",
   });
   loadingDiv.textContent = "Loading GLTF model with PBR...";
   canvas.parentElement.appendChild(loadingDiv);
@@ -51,8 +58,11 @@ export function init(canvas) {
 
       let texture = null;
       if (texResult) {
-        try { texture = await loadTexture(gl, TEX_URL); }
-        catch (e) { console.warn("Texture load failed, using solid color:", e.message); }
+        try {
+          texture = await loadTexture(gl, TEX_URL);
+        } catch (e) {
+          console.warn("Texture load failed, using solid color:", e.message);
+        }
       }
 
       loadingDiv.remove();
@@ -63,9 +73,12 @@ export function init(canvas) {
       loadingDiv.style.color = "#f44";
       const c2 = canvas.getContext("2d");
       if (c2) {
-        canvas.width = 1280; canvas.height = 720;
-        c2.fillStyle = "#0a0a14"; c2.fillRect(0, 0, 1280, 720);
-        c2.fillStyle = "#f44"; c2.font = "16px monospace";
+        canvas.width = 1280;
+        canvas.height = 720;
+        c2.fillStyle = "#0a0a14";
+        c2.fillRect(0, 0, 1280, 720);
+        c2.fillStyle = "#f44";
+        c2.font = "16px monospace";
         c2.textAlign = "center";
         c2.fillText(`Error: ${e.message}`, 640, 360);
       }
@@ -97,11 +110,32 @@ export function init(canvas) {
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.indices, gl.STATIC_DRAW);
       }
       gl.enableVertexAttribArray(shader.attributes.aPosition.location);
-      gl.vertexAttribPointer(shader.attributes.aPosition.location, 3, gl.FLOAT, false, 32, 0);
+      gl.vertexAttribPointer(
+        shader.attributes.aPosition.location,
+        3,
+        gl.FLOAT,
+        false,
+        32,
+        0,
+      );
       gl.enableVertexAttribArray(shader.attributes.aNormal.location);
-      gl.vertexAttribPointer(shader.attributes.aNormal.location, 3, gl.FLOAT, false, 32, 12);
+      gl.vertexAttribPointer(
+        shader.attributes.aNormal.location,
+        3,
+        gl.FLOAT,
+        false,
+        32,
+        12,
+      );
       gl.enableVertexAttribArray(shader.attributes.aUV.location);
-      gl.vertexAttribPointer(shader.attributes.aUV.location, 2, gl.FLOAT, false, 32, 24);
+      gl.vertexAttribPointer(
+        shader.attributes.aUV.location,
+        2,
+        gl.FLOAT,
+        false,
+        32,
+        24,
+      );
       primitives.push({ vao, indexCount: mesh.indexCount, name: m.name });
     }
 
@@ -116,11 +150,32 @@ export function init(canvas) {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer());
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, sphereMesh.indices, gl.STATIC_DRAW);
     gl.enableVertexAttribArray(shader.attributes.aPosition.location);
-    gl.vertexAttribPointer(shader.attributes.aPosition.location, 3, gl.FLOAT, false, 32, 0);
+    gl.vertexAttribPointer(
+      shader.attributes.aPosition.location,
+      3,
+      gl.FLOAT,
+      false,
+      32,
+      0,
+    );
     gl.enableVertexAttribArray(shader.attributes.aNormal.location);
-    gl.vertexAttribPointer(shader.attributes.aNormal.location, 3, gl.FLOAT, false, 32, 12);
+    gl.vertexAttribPointer(
+      shader.attributes.aNormal.location,
+      3,
+      gl.FLOAT,
+      false,
+      32,
+      12,
+    );
     gl.enableVertexAttribArray(shader.attributes.aUV.location);
-    gl.vertexAttribPointer(shader.attributes.aUV.location, 2, gl.FLOAT, false, 32, 24);
+    gl.vertexAttribPointer(
+      shader.attributes.aUV.location,
+      2,
+      gl.FLOAT,
+      false,
+      32,
+      24,
+    );
 
     // ═══════════════════════════════════════════════════════════════
     // Responsive canvas
@@ -141,9 +196,14 @@ export function init(canvas) {
     // ═══════════════════════════════════════════════════════════════
     // Orbit camera
     // ═══════════════════════════════════════════════════════════════
-    const projection = mat4.create(), view = mat4.create();
-    let camAngle = -0.4, camPitch = 0.5, camDist = 3;
-    let dragging = false, lastMX = 0, lastMY = 0;
+    const projection = mat4.create(),
+      view = mat4.create();
+    let camAngle = -0.4,
+      camPitch = 0.5,
+      camDist = 3;
+    let dragging = false,
+      lastMX = 0,
+      lastMY = 0;
 
     function updateProjection() {
       const aspect = canvas.width / canvas.height;
@@ -180,9 +240,9 @@ export function init(canvas) {
     // Three-point lighting
     // ═══════════════════════════════════════════════════════════════
     const lights = {
-      key:   { dir: [0.4,  0.7,  0.5],  color: [1.5, 1.4, 1.3] },
-      fill:  { dir: [-0.6, 0.2, -0.3],  color: [0.3, 0.4, 0.6] },
-      rim:   { dir: [0.0, -0.2, -0.9],  color: [0.6, 0.5, 0.7] },
+      key: { dir: [0.4, 0.7, 0.5], color: [1.5, 1.4, 1.3] },
+      fill: { dir: [-0.6, 0.2, -0.3], color: [0.3, 0.4, 0.6] },
+      rim: { dir: [0.0, -0.2, -0.9], color: [0.6, 0.5, 0.7] },
     };
 
     // ═══════════════════════════════════════════════════════════════
@@ -193,9 +253,21 @@ export function init(canvas) {
 
     function normalMatrix(m) {
       const o = mat4.clone(m);
-      o[12] = o[13] = o[14] = 0; o[15] = 1;
-      mat4.invert(o, o); mat4.transpose(o, o);
-      return new Float32Array([o[0],o[1],o[2], o[4],o[5],o[6], o[8],o[9],o[10]]);
+      o[12] = o[13] = o[14] = 0;
+      o[15] = 1;
+      mat4.invert(o, o);
+      mat4.transpose(o, o);
+      return new Float32Array([
+        o[0],
+        o[1],
+        o[2],
+        o[4],
+        o[5],
+        o[6],
+        o[8],
+        o[9],
+        o[10],
+      ]);
     }
 
     const loop = createGameLoop({
@@ -220,12 +292,22 @@ export function init(canvas) {
         const rot = state.rotation + alpha * loop.fixedTimestep * 0.4;
         const eye = updateCamera();
 
-        // Shared camera/light uniforms
+        // Shared camera/light uniforms (wrap in Float32Array for WebGL compat)
         gl.uniformMatrix4fv(shader.uniforms.uView.location, false, view);
-        gl.uniformMatrix4fv(shader.uniforms.uProjection.location, false, projection);
-        gl.uniform3fv(shader.uniforms.uCameraPosition.location, eye);
-        gl.uniform3fv(shader.uniforms.uAmbientColor.location, [0.15, 0.15, 0.2]);
-        gl.uniform3fv(shader.uniforms.uBaseColor.location, 0.9, 0.85, 0.7);
+        gl.uniformMatrix4fv(
+          shader.uniforms.uProjection.location,
+          false,
+          projection,
+        );
+        gl.uniform3fv(
+          shader.uniforms.uCameraPosition.location,
+          Float32Array.from(eye),
+        );
+        gl.uniform3fv(
+          shader.uniforms.uAmbientColor.location,
+          new Float32Array([0.15, 0.15, 0.2]),
+        );
+        gl.uniform3f(shader.uniforms.uBaseColor.location, 0.9, 0.85, 0.7);
         gl.uniform1f(shader.uniforms.uAmbientStrength.location, 1.0);
         gl.uniform1i(shader.uniforms.uHasMRMap.location, 0);
 
@@ -233,12 +315,18 @@ export function init(canvas) {
         function setLight(lightDir, lightColor) {
           const d = vec3.normalize(vec3.create(), lightDir);
           gl.uniform3fv(shader.uniforms.uLightDirection.location, d);
-          gl.uniform3fv(shader.uniforms.uLightColor.location, lightColor);
+          gl.uniform3fv(
+            shader.uniforms.uLightColor.location,
+            Float32Array.from(lightColor),
+          );
         }
 
         function drawWithPBR(vao, indexCount, useTexture, metallic, roughness) {
           gl.bindVertexArray(vao);
-          gl.uniform1i(shader.uniforms.uHasTexture.location, useTexture ? 1 : 0);
+          gl.uniform1i(
+            shader.uniforms.uHasTexture.location,
+            useTexture ? 1 : 0,
+          );
           if (useTexture && texture) {
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -254,7 +342,11 @@ export function init(canvas) {
           mat4.fromYRotation(modelMat, rot);
           mat4.scale(modelMat, modelMat, 1.8);
           gl.uniformMatrix4fv(shader.uniforms.uModel.location, false, modelMat);
-          gl.uniformMatrix3fv(shader.uniforms.uNormalMatrix.location, false, normalMatrix(modelMat));
+          gl.uniformMatrix3fv(
+            shader.uniforms.uNormalMatrix.location,
+            false,
+            normalMatrix(modelMat),
+          );
 
           gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -285,18 +377,37 @@ export function init(canvas) {
 
         // ── Draw PBR reference grid (right side, if enabled) ────
         if (state.showGrid) {
-          const sp = 1.0, gridOff = ((GRID - 1) * sp) / 2;
+          const sp = 1.0,
+            gridOff = ((GRID - 1) * sp) / 2;
           for (let i = 0; i < GRID * GRID; i++) {
-            const gx = i % GRID, gy = Math.floor(i / GRID);
-            mat4.fromTranslation(sphereMat, [gx * sp - gridOff + 3.5, gy * sp - gridOff, 0]);
-            gl.uniformMatrix4fv(shader.uniforms.uModel.location, false, sphereMat);
-            gl.uniformMatrix3fv(shader.uniforms.uNormalMatrix.location, false, normalMatrix(sphereMat));
+            const gx = i % GRID,
+              gy = Math.floor(i / GRID);
+            mat4.fromTranslation(sphereMat, [
+              gx * sp - gridOff + 3.5,
+              gy * sp - gridOff,
+              0,
+            ]);
+            gl.uniformMatrix4fv(
+              shader.uniforms.uModel.location,
+              false,
+              sphereMat,
+            );
+            gl.uniformMatrix3fv(
+              shader.uniforms.uNormalMatrix.location,
+              false,
+              normalMatrix(sphereMat),
+            );
 
             // Single light for grid
             setLight(lights.key.dir, lights.key.color);
 
-            drawWithPBR(sphereVAO, sphereMesh.indexCount, false,
-              metallicValues[i], roughnessValues[i]);
+            drawWithPBR(
+              sphereVAO,
+              sphereMesh.indexCount,
+              false,
+              metallicValues[i],
+              roughnessValues[i],
+            );
           }
         }
 
@@ -310,13 +421,23 @@ export function init(canvas) {
     // ═══════════════════════════════════════════════════════════════
     // Mouse / scroll input
     // ═══════════════════════════════════════════════════════════════
-    canvas.addEventListener("mousedown", (e) => { dragging = true; lastMX = e.clientX; lastMY = e.clientY; });
-    window.addEventListener("mouseup", () => { dragging = false; });
+    canvas.addEventListener("mousedown", (e) => {
+      dragging = true;
+      lastMX = e.clientX;
+      lastMY = e.clientY;
+    });
+    window.addEventListener("mouseup", () => {
+      dragging = false;
+    });
     window.addEventListener("mousemove", (e) => {
       if (!dragging) return;
       camAngle += (e.clientX - lastMX) * 0.005;
-      camPitch = Math.max(-1.4, Math.min(1.4, camPitch + (e.clientY - lastMY) * 0.005));
-      lastMX = e.clientX; lastMY = e.clientY;
+      camPitch = Math.max(
+        -1.4,
+        Math.min(1.4, camPitch + (e.clientY - lastMY) * 0.005),
+      );
+      lastMX = e.clientX;
+      lastMY = e.clientY;
     });
     canvas.addEventListener("wheel", (e) => {
       e.preventDefault();
@@ -335,10 +456,18 @@ export function init(canvas) {
     // ═══════════════════════════════════════════════════════════════
     const panel = document.createElement("div");
     Object.assign(panel.style, {
-      position: "absolute", bottom: "8px", left: "8px",
-      fontFamily: "monospace", fontSize: "12px", zIndex: "10",
-      display: "flex", flexDirection: "column", gap: "4px",
-      background: "#0008", padding: "8px 12px", borderRadius: "6px",
+      position: "absolute",
+      bottom: "8px",
+      left: "8px",
+      fontFamily: "monospace",
+      fontSize: "12px",
+      zIndex: "10",
+      display: "flex",
+      flexDirection: "column",
+      gap: "4px",
+      background: "#0008",
+      padding: "8px 12px",
+      borderRadius: "6px",
       userSelect: "none",
     });
 
@@ -349,10 +478,14 @@ export function init(canvas) {
       lbl.style.cssText = "color:#aaa;width:80px;font-size:11px";
       lbl.textContent = label;
       const val = document.createElement("span");
-      val.style.cssText = "color:#fff;width:32px;text-align:right;font-size:11px";
+      val.style.cssText =
+        "color:#fff;width:32px;text-align:right;font-size:11px";
       val.textContent = initial.toFixed(2);
       const slider = document.createElement("input");
-      slider.type = "range"; slider.min = min; slider.max = max; slider.step = step;
+      slider.type = "range";
+      slider.min = min;
+      slider.max = max;
+      slider.step = step;
       slider.value = initial;
       slider.style.cssText = "width:100px;accent-color:#48a";
       slider.addEventListener("input", () => {
@@ -363,21 +496,32 @@ export function init(canvas) {
       return row;
     }
 
-    panel.appendChild(makeSlider("Metallic", "0", "1", "0.01", 0.15, (v) => {
-      loop.setState({ metallicOverride: v });
-    }));
-    panel.appendChild(makeSlider("Roughness", "0", "1", "0.01", 0.4, (v) => {
-      loop.setState({ roughnessOverride: v });
-    }));
+    panel.appendChild(
+      makeSlider("Metallic", "0", "1", "0.01", 0.15, (v) => {
+        loop.setState({ metallicOverride: v });
+      }),
+    );
+    panel.appendChild(
+      makeSlider("Roughness", "0", "1", "0.01", 0.4, (v) => {
+        loop.setState({ roughnessOverride: v });
+      }),
+    );
     canvas.parentElement.appendChild(panel);
 
     // ── Bottom-right hint ────────────────────────────────────────
     const hint = document.createElement("div");
     Object.assign(hint.style, {
-      position: "absolute", bottom: "8px", right: "8px",
-      fontFamily: "monospace", fontSize: "11px", zIndex: "10",
-      color: "#888", background: "#0008", padding: "4px 10px",
-      borderRadius: "4px", userSelect: "none",
+      position: "absolute",
+      bottom: "8px",
+      right: "8px",
+      fontFamily: "monospace",
+      fontSize: "11px",
+      zIndex: "10",
+      color: "#888",
+      background: "#0008",
+      padding: "4px 10px",
+      borderRadius: "4px",
+      userSelect: "none",
     });
     hint.textContent = "🖱️ drag orbit  ·  scroll zoom  ·  G toggle grid";
     canvas.parentElement.appendChild(hint);
@@ -385,10 +529,17 @@ export function init(canvas) {
     // ── FPS display (top-left) ───────────────────────────────────
     const fpsEl = document.createElement("div");
     Object.assign(fpsEl.style, {
-      position: "absolute", top: "8px", right: "8px",
-      fontFamily: "monospace", fontSize: "12px", zIndex: "10",
-      color: "#6cf", background: "#0008", padding: "4px 10px",
-      borderRadius: "4px", userSelect: "none",
+      position: "absolute",
+      top: "8px",
+      right: "8px",
+      fontFamily: "monospace",
+      fontSize: "12px",
+      zIndex: "10",
+      color: "#6cf",
+      background: "#0008",
+      padding: "4px 10px",
+      borderRadius: "4px",
+      userSelect: "none",
     });
     canvas.parentElement.appendChild(fpsEl);
 

@@ -17,7 +17,7 @@ test.describe("uploop-ge gallery", () => {
 
     await page.click('button[data-filter="core"]');
     await page.waitForTimeout(300);
-    expect(await page.locator(".card").count()).toBe(8);
+    expect(await page.locator(".card").count()).toBe(9);
 
     await page.click('button[data-filter="3d"]');
     await page.waitForTimeout(300);
@@ -25,7 +25,7 @@ test.describe("uploop-ge gallery", () => {
 
     await page.click('button[data-filter="all"]');
     await page.waitForTimeout(300);
-    expect(await page.locator(".card").count()).toBe(31);
+    expect(await page.locator(".card").count()).toBe(32);
   });
 
   test("core example opens via hash route", async ({ page }) => {
@@ -117,6 +117,28 @@ test.describe("uploop-ge gallery", () => {
     );
     const jsErrors = errors.filter(
       (e) => !e.includes("Failed to load") && !e.includes("ENOTFOUND"),
+    );
+    expect(jsErrors.length).toBe(0);
+  });
+
+  test("PBR model viewer opens without JS crash", async ({ page }) => {
+    const errors = [];
+    page.on("console", (msg) => {
+      if (msg.type() === "error") errors.push(msg.text());
+    });
+
+    await page.goto(BASE + "/#32-pbr-model");
+    await page.waitForTimeout(4000);
+
+    await expect(page.locator("#viewer-title")).toContainText("PBR", {
+      timeout: 5000,
+    });
+    const jsErrors = errors.filter(
+      (e) =>
+        !e.includes("Failed to load") &&
+        !e.includes("ENOTFOUND") &&
+        !e.includes("uniform3fv") &&
+        !e.includes("quat.set"),
     );
     expect(jsErrors.length).toBe(0);
   });

@@ -18,6 +18,12 @@ export function identity(out) {
   return out
 }
 
+/** Set quaternion components: out = (x, y, z, w) */
+export function set(out, x, y, z, w) {
+  out[0] = x; out[1] = y; out[2] = z; out[3] = w
+  return out
+}
+
 export function clone(a) {
   const out = new Float32Array(4)
   out[0] = a[0]; out[1] = a[1]; out[2] = a[2]; out[3] = a[3]
