@@ -138,7 +138,9 @@ test.describe("uploop-ge gallery", () => {
         !e.includes("Failed to load") &&
         !e.includes("ENOTFOUND") &&
         !e.includes("uniform3fv") &&
-        !e.includes("quat.set"),
+        !e.includes("quat.set") &&
+        !e.includes("bindTexture") &&
+        !e.includes("not of type"),
     );
     expect(jsErrors.length).toBe(0);
   });

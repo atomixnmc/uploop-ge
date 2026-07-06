@@ -56,10 +56,12 @@ export function init(canvas) {
       const gl = canvas.getContext("webgl2");
       if (!gl) throw new Error("WebGL2 not available");
 
+      // Reload texture on the real GL context (textures are per-context)
       let texture = null;
       if (texResult) {
         try {
-          texture = await loadTexture(gl, TEX_URL);
+          const texObj = await loadTexture(gl, TEX_URL);
+          texture = texObj?.texture || null;
         } catch (e) {
           console.warn("Texture load failed, using solid color:", e.message);
         }
