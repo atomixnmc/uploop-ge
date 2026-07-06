@@ -172,6 +172,7 @@ uniform bool uHasMRMap;
 uniform float uMetallic;
 uniform float uRoughness;
 uniform vec3 uBaseColor;
+uniform float uAmbientStrength;
 
 // Light
 uniform vec3 uLightDirection;
@@ -232,9 +233,83 @@ void main() {
   vec3 specular = numerator / denominator;
 
   vec3 Lo = (kD * albedo / PI + specular) * uLightColor * NdotL;
-  vec3 ambient = uAmbientColor * albedo * 0.03;
+  vec3 ambient = uAmbientColor * albedo * uAmbientStrength;
 
   fragColor = vec4(ambient + Lo, uColor.a);
+}`,
+}
+
+// --- Skinned Phong (for animated models with bone weights) ---
+
+export const skinned = {
+  vertex: `#version 300 es
+in vec3 aPosition;
+in vec3 aNormal;
+in vec2 aUV;
+in vec4 aJoints;
+in vec4 aWeights;
+
+uniform mat4 uModel;
+uniform mat4 uView;
+uniform mat4 uProjection;
+uniform mat3 uNormalMatrix;
+uniform mat4 uJointMatrices[64];
+
+out vec3 vWorldPos;
+out vec3 vNormal;
+out vec2 vUV;
+
+void main() {
+  mat4 skinMat =
+    aWeights.x * uJointMatrices[int(aJoints.x)] +
+    aWeights.y * uJointMatrices[int(aJoints.y)] +
+    aWeights.z * uJointMatrices[int(aJoints.z)] +
+    aWeights.w * uJointMatrices[int(aJoints.w)];
+
+  vec4 worldPos = uModel * skinMat * vec4(aPosition, 1.0);
+  gl_Position = uProjection * uView * worldPos;
+  vWorldPos = worldPos.xyz;
+  vNormal = normalize(uNormalMatrix * mat3(skinMat) * aNormal);
+  vUV = aUV;
+}`,
+
+  fragment: `#version 300 es
+${PRECISION}
+in vec3 vWorldPos;
+in vec3 vNormal;
+in vec2 vUV;
+
+uniform vec3 uCameraPosition;
+uniform vec4 uColor;
+uniform sampler2D uTexture;
+uniform bool uHasTexture;
+
+// Light
+uniform vec3 uLightDirection;
+uniform vec3 uLightColor;
+uniform vec3 uAmbientColor;
+uniform float uAmbientStrength;
+
+// Material
+uniform float uSpecularStrength;
+uniform float uShininess;
+
+out vec4 fragColor;
+
+void main() {
+  vec3 base = uHasTexture ? texture(uTexture, vUV).rgb : uColor.rgb;
+  vec3 N = normalize(vNormal);
+  vec3 L = normalize(-uLightDirection);
+  vec3 V = normalize(uCameraPosition - vWorldPos);
+  vec3 H = normalize(L + V);
+
+  vec3 ambient = uAmbientColor * uAmbientStrength * base;
+  float diff = max(dot(N, L), 0.0);
+  vec3 diffuse = uLightColor * diff * base;
+  float spec = pow(max(dot(N, H), 0.0), uShininess);
+  vec3 specular = uLightColor * spec * uSpecularStrength;
+
+  fragColor = vec4(ambient + diffuse + specular, uColor.a);
 }`,
 }
 

@@ -27,6 +27,30 @@ importers:
         specifier: workspace:*
         version: link:../math
 
+  packages/custom-pipeline:
+    dependencies:
+      '@uploop/renderer':
+        specifier: workspace:*
+        version: link:../renderer
+      '@uploop/shader':
+        specifier: workspace:*
+        version: link:../shader
+
+  packages/director:
+    dependencies:
+      '@uploop/math':
+        specifier: workspace:*
+        version: link:../math
+
+  packages/engine:
+    dependencies:
+      '@uploop/renderer':
+        specifier: workspace:*
+        version: link:../renderer
+      '@uploop/scene':
+        specifier: workspace:*
+        version: link:../scene
+
   packages/game-ui:
     dependencies:
       '@uploop/math':
@@ -50,6 +74,8 @@ importers:
 
   packages/math: {}
 
+  packages/parallel: {}
+
   packages/physics:
     dependencies:
       '@uploop/math':
@@ -58,6 +84,15 @@ importers:
       '@uploop/scene':
         specifier: workspace:*
         version: link:../scene
+
+  packages/ray-tracing:
+    dependencies:
+      '@uploop/geometry':
+        specifier: workspace:*
+        version: link:../geometry
+      '@uploop/math':
+        specifier: workspace:*
+        version: link:../math
 
   packages/renderer:
     dependencies:

@@ -11,6 +11,6 @@
  */
 
 export { loadOBJ, parseOBJ } from './obj.js'
-export { loadGLTF, parseGLTF } from './gltf.js'
+export { loadGLTF, parseGLTF, extractImageData } from './gltf.js'
 export { loadTexture, loadCubemap } from './texture.js'
 export { loadModel } from './loader.js'

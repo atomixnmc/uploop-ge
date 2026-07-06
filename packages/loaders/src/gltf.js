@@ -71,7 +71,8 @@ export function parseGLTF(json, binary) {
   // ── Meshes ──────────────────────────────────────────────────────
   const meshes = []
   if (json.meshes) {
-    for (const m of json.meshes) {
+    for (let mi = 0; mi < json.meshes.length; mi++) {
+      const m = json.meshes[mi];
       for (const prim of m.primitives) {
         const posAcc = prim.attributes.POSITION != null ? readAccessor(prim.attributes.POSITION) : null
         const nrmAcc = prim.attributes.NORMAL != null ? readAccessor(prim.attributes.NORMAL) : null
@@ -97,8 +98,10 @@ export function parseGLTF(json, binary) {
         meshes.push({
           name: m.name || `mesh_${meshes.length}`,
           mesh: Mesh({ vertices, indices: idxArr, format: fmt }),
+          gltfMeshIndex: mi,
           joints: prim.attributes.JOINTS_0 != null ? readAccessor(prim.attributes.JOINTS_0) : null,
           weights: prim.attributes.WEIGHTS_0 != null ? readAccessor(prim.attributes.WEIGHTS_0) : null,
+          materialIndex: prim.material ?? null,
         })
       }
     }
@@ -153,7 +156,53 @@ export function parseGLTF(json, binary) {
     }
   }
 
-  return { meshes, nodes, animations, skins }
+  // ── Images ──────────────────────────────────────────────────────
+  const images = []
+  if (json.images) {
+    for (const img of json.images) {
+      images.push({
+        name: img.name || null,
+        bufferView: img.bufferView ?? null,
+        uri: img.uri || null,
+        mimeType: img.mimeType || null,
+      })
+    }
+  }
+
+  // ── Textures ────────────────────────────────────────────────────
+  const textures = []
+  if (json.textures) {
+    for (const tex of json.textures) {
+      textures.push({
+        source: tex.source ?? null,
+        sampler: tex.sampler ?? null,
+      })
+    }
+  }
+
+  // ── Materials ───────────────────────────────────────────────────
+  const materials = []
+  if (json.materials) {
+    for (const mat of json.materials) {
+      const pbr = mat.pbrMetallicRoughness || {}
+      materials.push({
+        name: mat.name || null,
+        baseColorFactor: pbr.baseColorFactor ? [...pbr.baseColorFactor] : [1, 1, 1, 1],
+        baseColorTexture: pbr.baseColorTexture ? { ...pbr.baseColorTexture } : null,
+        metallicFactor: pbr.metallicFactor ?? 1,
+        roughnessFactor: pbr.roughnessFactor ?? 1,
+        metallicRoughnessTexture: pbr.metallicRoughnessTexture ? { ...pbr.metallicRoughnessTexture } : null,
+        normalTexture: mat.normalTexture ? { ...mat.normalTexture } : null,
+        occlusionTexture: mat.occlusionTexture ? { ...mat.occlusionTexture } : null,
+        emissiveTexture: mat.emissiveTexture ? { ...mat.emissiveTexture } : null,
+        emissiveFactor: mat.emissiveFactor ? [...mat.emissiveFactor] : [0, 0, 0],
+        alphaMode: mat.alphaMode || 'OPAQUE',
+        alphaCutoff: mat.alphaCutoff ?? 0.5,
+      })
+    }
+  }
+
+  return { meshes, nodes, animations, skins, images, textures, materials }
 }
 
 /**
@@ -252,6 +301,7 @@ async function loadAllBuffers(json, baseUrl, glbBinary) {
 
 /**
  * Fetch and parse a GLTF/GLB file from a URL.
+ * Also fetches external image URIs.
  * @param {string} url
  * @returns {Promise<Object>}
  */
@@ -259,17 +309,107 @@ export async function loadGLTF(url) {
   const resp = await fetch(url)
   const buffer = await resp.arrayBuffer()
 
+  let json, merged
+
   // Detect GLB vs GLTF
   if (url.endsWith('.glb') || new DataView(buffer).getUint32(0, true) === GLB_MAGIC) {
-    const { json, binary } = parseGLB(buffer)
-    const merged = await loadAllBuffers(json, url, binary)
-    return parseGLTF(json, merged)
+    const parsed = parseGLB(buffer)
+    json = parsed.json
+    merged = await loadAllBuffers(json, url, parsed.binary)
+  } else {
+    // Plain GLTF (JSON + external .bin files)
+    json = JSON.parse(new TextDecoder().decode(buffer))
+    merged = await loadAllBuffers(json, url, null)
   }
 
-  // Plain GLTF (JSON + external .bin files)
-  const json = JSON.parse(new TextDecoder().decode(buffer))
-  const merged = await loadAllBuffers(json, url, null)
-  return parseGLTF(json, merged)
+  const result = parseGLTF(json, merged)
+
+  // ── Fetch external images ────────────────────────────────────────
+  const imageData = []
+  if (json.images) {
+    for (const img of json.images) {
+      if (img.bufferView != null) {
+        // Embedded image — extract from binary
+        try {
+          imageData.push(extractImageData(json, merged, json.images.indexOf(img)))
+        } catch (e) {
+          console.warn(`Failed to extract embedded image: ${e.message}`)
+          imageData.push(null)
+        }
+      } else if (img.uri) {
+        // External image — fetch from URL
+        try {
+          const fullUrl = new URL(img.uri, url).href
+          const imgResp = await fetch(fullUrl)
+          if (imgResp.ok) {
+            const imgBuffer = await imgResp.arrayBuffer()
+            imageData.push({
+              data: imgBuffer,
+              mimeType: img.mimeType || guessMimeFromUri(img.uri),
+            })
+          } else {
+            console.warn(`Failed to fetch image: ${img.uri} (${imgResp.status})`)
+            imageData.push(null)
+          }
+        } catch (e) {
+          console.warn(`Failed to fetch image: ${img.uri} — ${e.message}`)
+          imageData.push(null)
+        }
+      } else {
+        imageData.push(null)
+      }
+    }
+  }
+
+  return { ...result, imageData }
+}
+
+/**
+ * Guess MIME type from a URI extension.
+ * @param {string} uri
+ * @returns {string}
+ */
+function guessMimeFromUri(uri) {
+  const ext = uri.split('?')[0].split('.').pop().toLowerCase()
+  switch (ext) {
+    case 'png': return 'image/png'
+    case 'jpg': case 'jpeg': return 'image/jpeg'
+    case 'webp': return 'image/webp'
+    case 'bmp': return 'image/bmp'
+    default: return 'image/png'
+  }
+}
+
+/**
+ * Extract image data for a given image index from a GLTF JSON + binary.
+ * For embedded images (bufferView), extracts from the binary buffer.
+ * For external URIs, returns { data: null, uri, mimeType } — the caller
+ * must handle fetching separately.
+ * @param {Object} json — GLTF JSON
+ * @param {ArrayBuffer} binary — merged binary buffer
+ * @param {number} imageIndex — index into json.images
+ * @returns {{ data: ArrayBuffer|null, mimeType: string|null, uri?: string }}
+ */
+export function extractImageData(json, binary, imageIndex) {
+  const img = json.images?.[imageIndex]
+  if (!img) throw new Error(`Image index ${imageIndex} not found`)
+
+  if (img.bufferView != null) {
+    const bv = json.bufferViews[img.bufferView]
+    const byteOffset = bv.byteOffset || 0
+    const byteLength = bv.byteLength
+    if (byteOffset + byteLength > binary.byteLength) {
+      throw new Error(
+        `Image ${imageIndex}: bufferView byte range ${byteOffset}+${byteLength} ` +
+        `exceeds binary length ${binary.byteLength}`
+      )
+    }
+    const data = binary.slice(byteOffset, byteOffset + byteLength)
+    return { data, mimeType: img.mimeType || null }
+  }
+
+  // External URI — caller handles fetching
+  return { data: null, mimeType: img.mimeType || null, uri: img.uri }
 }
 
 export default { loadGLTF, parseGLTF, parseGLB }

@@ -1,8 +1,8 @@
 {
   "name": "uploop-ge",
   "private": true,
-  "version": "0.2.1"
-  "type": "module",
+  "version": "0.2.1",
+    "type": "module",
   "workspaces": [
     "packages/*",
     "examples/*"
