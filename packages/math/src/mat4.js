@@ -308,6 +308,7 @@ export function fromQuat(out, q) {
 }
 
 /** Compose TRS: out = translate * rotate * scale */
+/** Compose a matrix from translation, quaternion rotation, and scale. */
 export function compose(out, translation, quaternion, scaleVec) {
   const x = quaternion[0], y = quaternion[1], z = quaternion[2], w = quaternion[3]
   const x2 = x + x, y2 = y + y, z2 = z + z
@@ -320,6 +321,11 @@ export function compose(out, translation, quaternion, scaleVec) {
   out[8] = (xz + wy) * sz;       out[9] = (yz - wx) * sz;       out[10] = (1 - (xx + yy)) * sz; out[11] = 0
   out[12] = translation[0]; out[13] = translation[1]; out[14] = translation[2]; out[15] = 1
   return out
+}
+
+/** Compose from rotation, translation, scale (convenience alias, arg order: rot, pos, scale). */
+export function fromRotationTranslationScaleOrigin(out, rotation, translation, scaleVec) {
+  return compose(out, translation, rotation, scaleVec)
 }
 
 /** Decompose mat4 into translation, quaternion, scale */

@@ -106,6 +106,18 @@ describe('mat4', () => {
     expect(result).not.toBeNull()
     expect(inv[12]).toBe(-5)
   })
+
+  it('fromRotationTranslationScaleOrigin', () => {
+    const out = mat4.create()
+    mat4.fromRotationTranslationScaleOrigin(out, quat.create(), vec3.create(1, 2, 3), vec3.create(2, 2, 2))
+    expect(out[0]).toBe(2)
+    expect(out[5]).toBe(2)
+    expect(out[10]).toBe(2)
+    expect(out[12]).toBe(1)
+    expect(out[13]).toBe(2)
+    expect(out[14]).toBe(3)
+    expect(out[15]).toBe(1)
+  })
 })
 
 describe('quat', () => {
