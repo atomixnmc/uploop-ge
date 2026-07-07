@@ -44,6 +44,9 @@ export function subtract(out, a, b) {
   return out
 }
 
+/** Alias for subtract */
+export const sub = subtract
+
 export function multiply(out, a, b) {
   out[0] = a[0] * b[0]
   out[1] = a[1] * b[1]
